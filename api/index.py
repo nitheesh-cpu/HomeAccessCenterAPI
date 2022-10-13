@@ -394,7 +394,7 @@ def assignments():
         content = getAssignments(data) 
         return json.dumps(content), 200, {"Content-Type": "application/json"}
         
-@app.route("/api/info", methods=['GET'])
+@app.route("/info", methods=['GET'])
 def info():
     if 'user' in request.args and 'pass' in request.args:
         data = login_data
@@ -403,7 +403,7 @@ def info():
         content = getInfo(data)
         return json.dumps(content), 200, {"Content-Type": "application/json"}
 
-@app.route('/api/transcript')
+@app.route('/transcript')
 def transcript():
     if 'user' in request.args and 'pass' in request.args:
         data = login_data
