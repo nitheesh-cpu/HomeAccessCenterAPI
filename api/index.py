@@ -317,7 +317,6 @@ def getName(login_data):
             return None
         container = content.find('div', class_='sg-banner-menu-container')
         name = container.find('span')
-        session['name'] = name.text.strip()
         return data
 
 def getTranscript(login_data):
