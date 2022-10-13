@@ -413,5 +413,5 @@ def transcript():
         return json.dumps(content), 200, {"Content-Type": "application/json"}
 
 @app.route('/api/')
-def transcript():
+def apiHelp():
     return json.dumps({'success': True, 'message': 'This is the home page'}), 200, {"Content-Type": "application/json"}
