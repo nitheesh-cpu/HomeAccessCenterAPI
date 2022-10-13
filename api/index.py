@@ -481,6 +481,19 @@ def transcript():
         return json.dumps(content), 200, {"Content-Type": "application/json"}
     return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
+@app.route('/api/name')
+def name():
+    if 'user' in request.args and 'pass' in request.args:
+        data = login_data
+        data['LogOnDetails.UserName'] = request.args['user']
+        data['LogOnDetails.Password'] = request.args['pass']
+        content = handlers.getName(data)
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
+        return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return json.dumps({'success': False, 'message': 'Page not found'}), 404, {"Content-Type": "application/json"}
