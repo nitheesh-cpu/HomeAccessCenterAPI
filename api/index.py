@@ -489,7 +489,7 @@ def name():
         content = getName(data)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
-        return json.dumps(content), 200, {"Content-Type": "application/json"}
+        return json.dumps({'name':content}), 200, {"Content-Type": "application/json"}
     return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 
