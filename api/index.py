@@ -81,6 +81,10 @@ def getAssignments(login_data):
             l['assignments'] = assig
             l['categories'] = categories
             ret[classes[i]] = l
+        
+        if len(ret) == 0:
+            return None
+
         return ret
 
 def getInfo(login_data):
@@ -93,14 +97,17 @@ def getInfo(login_data):
         ret = {}
         assignments = session.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/Registration.aspx')
         content = BeautifulSoup(assignments.text, 'lxml')
-        ret['name'] = content.find('span', id='plnMain_lblRegStudentName').text.strip()
-        ret['grade'] = content.find('span', id='plnMain_lblGrade').text.strip()
-        ret['school'] = content.find('span', id='plnMain_lblBuildingName').text.strip()
-        ret['dob'] = content.find('span', id='plnMain_lblBirthDate').text.strip()
-        ret['councelor'] = content.find('span', id='plnMain_lblCounselor').text.strip()
-        ret['language'] = content.find('span', id='plnMain_lblLanguage').text.strip()
-        ret['cohort-year'] = content.find('span', id='plnMain_lblCohortYear').text.strip()
-        return ret
+        if content.find('span', id='plnMain_lblRegStudentName') is not None:
+            ret['name'] = content.find('span', id='plnMain_lblRegStudentName').text.strip()
+            ret['grade'] = content.find('span', id='plnMain_lblGrade').text.strip()
+            ret['school'] = content.find('span', id='plnMain_lblBuildingName').text.strip()
+            ret['dob'] = content.find('span', id='plnMain_lblBirthDate').text.strip()
+            ret['councelor'] = content.find('span', id='plnMain_lblCounselor').text.strip()
+            ret['language'] = content.find('span', id='plnMain_lblLanguage').text.strip()
+            ret['cohort-year'] = content.find('span', id='plnMain_lblCohortYear').text.strip()
+            return ret
+        else:
+            return None
 
 def getAssignmentClass(login_data,class_name):
     with requests.Session() as ses:
@@ -119,6 +126,8 @@ def getAssignmentClass(login_data,class_name):
         content = BeautifulSoup(assignments.text, 'lxml')
 
         for x in content.find_all('div', class_='AssignmentClass'):
+            if x.find('div', class_="sg-header") is None:
+                return None
             header = x.find('div', class_="sg-header")
             q = header.find('a', class_='sg-header-heading').text.strip()[12:]
             w = header.find('span', class_='sg-header-heading')
@@ -184,6 +193,7 @@ def getAverages(login_data):
         content = BeautifulSoup(assignments.text, 'lxml')
 
         for x in content.find_all('div', class_='AssignmentClass'):
+
             header = x.find('div', class_="sg-header")
             q = header.find('a', class_='sg-header-heading').text.strip()[12:]
             w = header.find('span', class_='sg-header-heading')
@@ -193,6 +203,10 @@ def getAverages(login_data):
         ret = {}
         for i in range(len(classes)):
             ret[classes[i]] = averages[i]
+        
+        if len(ret) == 0:
+            return None
+
         return ret
 
 def getClasses(login_data):
@@ -208,6 +222,7 @@ def getClasses(login_data):
         content = BeautifulSoup(assignments.text, 'lxml')
 
         for x in content.find_all('div', class_='AssignmentClass'):
+
             header = x.find('div', class_="sg-header")
             q = header.find('a', class_='sg-header-heading').text.strip()[12:]
             classes.append(q.strip())
@@ -253,6 +268,8 @@ def getReport(login_data):
             del j[6]
             del j[5]
         finaldata['data'] = data
+        if len(finaldata['data']) == 0:
+            return None
         return finaldata
 
 def getProgressReport(login_data):
@@ -270,16 +287,38 @@ def getProgressReport(login_data):
         headers = []
         row = []
         data = []
+        if reportcardcontent.find_all('tr') is None:
+            return None
         for x in reportcardcontent.find_all('tr'):
             for c in x.find_all('td'):
                 row.append(c.text.strip())
             data.append(row)
             row = []
+        
+        if len(data)==0:
+            return None
         headers = data[0]
         data.pop(0)
         finaldata['headers'] = headers
         finaldata['data'] = data
         return finaldata
+
+def getName(login_data):
+    with requests.Session() as ses:
+        data = {}
+        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        r = ses.get(login_url)
+        soup = BeautifulSoup(r.content, 'lxml')
+        login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
+        post = ses.post(login_url, data=login_data)
+        page = ses.get('https://homeaccess.katyisd.org/HomeAccess/Home/WeekView')
+        content = BeautifulSoup(page.text, 'lxml')
+        if content.find('div', class_='sg-banner-menu-container') is None:
+            return None
+        container = content.find('div', class_='sg-banner-menu-container')
+        name = container.find('span')
+        session['name'] = name.text.strip()
+        return data
 
 def getTranscript(login_data):
     with requests.Session() as session:
@@ -297,6 +336,9 @@ def getTranscript(login_data):
             f.write(str(content))
         transcript = {}
         
+        if content.find_all('td', class_='sg-transcript-group') is None:
+            return None
+
         for x in content.find_all('td', class_='sg-transcript-group'):
             semester = {}
             table1 = x.find_next('table')
@@ -329,6 +371,10 @@ def getTranscript(login_data):
                     semester['credits'] = z.text.strip()
             transcript[semester['year'] + " - Semester "+ semester['semester']] = semester
         x = content.find('table', id='plnMain_rpTranscriptGroup_tblCumGPAInfo')
+
+        if x is None:
+            return None
+
         for y in x.find_all('tr', class_="sg-asp-table-data-row"):
             for z in y.find_all('span'):
                 if "GPADescr" in z.attrs['id']:
@@ -352,8 +398,12 @@ def classes():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getClasses(data)
+        content = handlers.getClasses(data)
+        if len(content['classes']) == 0:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
+
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 @app.route("/api/ipr", methods=['GET'])
 def ipr():
@@ -361,8 +411,11 @@ def ipr():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getProgressReport(data)
+        content = handlers.getProgressReport(data)
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 @app.route("/api/reportcard", methods=['GET'])
 def reportcard():
@@ -370,8 +423,11 @@ def reportcard():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getReport(data)
+        content = handlers.getReport(data)
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
         
 @app.route("/api/averages", methods=['GET'])
 def averages():
@@ -379,8 +435,11 @@ def averages():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getAverages(data)
+        content = handlers.getAverages(data)
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
         
 @app.route("/api/assignments", methods=['GET'])
 def assignments():
@@ -391,8 +450,11 @@ def assignments():
         if 'class' in request.args:
             content = handlers.getAssignmentClass(data, request.args['class'])
             return json.dumps(content), 200, {"Content-Type": "application/json"}
-        content = getAssignments(data) 
+        content = handlers.getAssignments(data) 
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
         
 @app.route("/api/info", methods=['GET'])
 def info():
@@ -400,8 +462,12 @@ def info():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getInfo(data)
+        content = handlers.getInfo(data)
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
+
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 @app.route('/api/transcript')
 def transcript():
@@ -409,8 +475,15 @@ def transcript():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getTranscript(data)
+        content = handlers.getTranscript(data)
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return json.dumps({'success': False, 'message': 'Page not found'}), 404, {"Content-Type": "application/json"}
 
 @app.route('/api/')
 def apiHelp():
