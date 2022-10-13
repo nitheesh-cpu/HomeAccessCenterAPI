@@ -398,7 +398,7 @@ def classes():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = handlers.getClasses(data)
+        content = getClasses(data)
         if len(content['classes']) == 0:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
 
@@ -411,7 +411,7 @@ def ipr():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = handlers.getProgressReport(data)
+        content = getProgressReport(data)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -423,7 +423,7 @@ def reportcard():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = handlers.getReport(data)
+        content = getReport(data)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -435,7 +435,7 @@ def averages():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = handlers.getAverages(data)
+        content = getAverages(data)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -448,9 +448,9 @@ def assignments():
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
         if 'class' in request.args:
-            content = handlers.getAssignmentClass(data, request.args['class'])
+            content = getAssignmentClass(data, request.args['class'])
             return json.dumps(content), 200, {"Content-Type": "application/json"}
-        content = handlers.getAssignments(data) 
+        content = getAssignments(data) 
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -462,7 +462,7 @@ def info():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = handlers.getInfo(data)
+        content = getInfo(data)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
 
@@ -475,7 +475,7 @@ def transcript():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = handlers.getTranscript(data)
+        content = getTranscript(data)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -487,7 +487,7 @@ def name():
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = handlers.getName(data)
+        content = getName(data)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
