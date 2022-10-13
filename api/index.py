@@ -386,7 +386,7 @@ def getTranscript(login_data):
 
 @app.route('/', methods=['GET'])
 def home():
-    return json.dumps({'success': True, 'message': 'This is the home page'}), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': True, 'message': 'This is the home page, visit the documentation at https://homeaccesscenterapi-docs.vercel.app/'}), 200, {"Content-Type": "application/json"}
 
 @app.route('/help', methods=['GET'])
 def help():
@@ -403,7 +403,7 @@ def classes():
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
 
         return json.dumps(content), 200, {"Content-Type": "application/json"}
-    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 @app.route("/api/ipr", methods=['GET'])
 def ipr():
@@ -415,7 +415,7 @@ def ipr():
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
-    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 @app.route("/api/reportcard", methods=['GET'])
 def reportcard():
@@ -427,7 +427,7 @@ def reportcard():
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
-    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
         
 @app.route("/api/averages", methods=['GET'])
 def averages():
@@ -439,7 +439,7 @@ def averages():
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
-    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
         
 @app.route("/api/assignments", methods=['GET'])
 def assignments():
@@ -454,7 +454,7 @@ def assignments():
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
-    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
         
 @app.route("/api/info", methods=['GET'])
 def info():
@@ -467,7 +467,7 @@ def info():
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
 
         return json.dumps(content), 200, {"Content-Type": "application/json"}
-    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 @app.route('/api/transcript')
 def transcript():
@@ -479,7 +479,7 @@ def transcript():
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
-    return json.dumps({'success': False, 'message': 'Missing required headers: "link", "user" and "pass"', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -487,4 +487,4 @@ def page_not_found(e):
 
 @app.route('/api/')
 def apiHelp():
-    return json.dumps({'success': True, 'message': 'This is the home page'}), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': True, 'message': 'This is the home page, visit the documentation at https://homeaccesscenterapi-docs.vercel.app/'}), 200, {"Content-Type": "application/json"}
