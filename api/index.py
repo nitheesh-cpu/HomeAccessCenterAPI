@@ -411,3 +411,7 @@ def transcript():
         data['LogOnDetails.Password'] = request.args['pass']
         content = getTranscript(data)
         return json.dumps(content), 200, {"Content-Type": "application/json"}
+
+@app.route('/api/')
+def transcript():
+    return json.dumps({'success': True, 'message': 'This is the home page'}), 200, {"Content-Type": "application/json"}
