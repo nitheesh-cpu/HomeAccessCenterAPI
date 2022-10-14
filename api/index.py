@@ -309,10 +309,11 @@ def getProgressReport(login_data, link):
         finaldata['data'] = data
         return finaldata
 
-def getName(login_data, link):
+def getName(login_data, link="https://homeaccess.katyisd.org/"):
     with requests.Session() as ses:
         data = {}
         login_url = link + "HomeAccess/Account/LogOn"
+        print(login_url)
         r = ses.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
@@ -387,14 +388,21 @@ def getTranscript(login_data, link):
         return transcript
 
 def checkLink(link):
-    try:
-        with requests.Session() as session:
-            login_url = link + "HomeAccess/Account/LogOn"
+    # try:
+    with requests.Session() as session:
+        login_url = link + "HomeAccess/Account/LogOn"
+        try:
+            print('succeeded')
             r = session.get(login_url)
-            soup = BeautifulSoup(r.content, 'lxml')
-            login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
-    except:
-        return False
+        except:
+            print('failed')
+            return False
+        soup = BeautifulSoup(r.content, 'lxml')
+        login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
+        return True
+    # except:
+    #     print("fhkjldfajhklfdajklhdfsakl")
+    #     return False
 
 @app.route('/', methods=['GET'])
 def home():
@@ -406,14 +414,16 @@ def help():
 
 @app.route('/api/classes', methods=['GET'])
 def classes():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args :
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -426,14 +436,16 @@ def classes():
 
 @app.route("/api/ipr", methods=['GET'])
 def ipr():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -445,14 +457,16 @@ def ipr():
 
 @app.route("/api/reportcard", methods=['GET'])
 def reportcard():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -464,14 +478,16 @@ def reportcard():
         
 @app.route("/api/averages", methods=['GET'])
 def averages():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -483,14 +499,16 @@ def averages():
         
 @app.route("/api/assignments", methods=['GET'])
 def assignments():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -505,14 +523,16 @@ def assignments():
         
 @app.route("/api/info", methods=['GET'])
 def info():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -525,14 +545,16 @@ def info():
 
 @app.route('/api/transcript')
 def transcript():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -544,14 +566,16 @@ def transcript():
 
 @app.route('/api/name')
 def name():
-    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
-        link = request.args['link']
-        if link[-1] != '/':
-            link += '/'
-        if link[:8] != 'https://':
-            link = 'https://' + link
-        if not checkLink(link):
-            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
@@ -571,4 +595,4 @@ def apiHelp():
     return json.dumps({'success': True, 'message': 'This is the home page, visit the documentation at https://homeaccesscenterapi-docs.vercel.app/'}), 200, {"Content-Type": "application/json"}
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    app.run(host='127.0.0.1', port=5000, debug=True)
