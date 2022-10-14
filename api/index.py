@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, url_for
 import json
 import requests
 from bs4 import BeautifulSoup
@@ -16,6 +16,8 @@ login_data = {
     'tempPW': '',
     'LogOnDetails.Password': ''
 }
+
+app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon.ico'))
 
 def getAssignments(login_data):
     with requests.Session() as ses:
