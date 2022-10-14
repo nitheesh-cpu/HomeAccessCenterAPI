@@ -388,11 +388,11 @@ def getTranscript(login_data, link):
 
 def checkLink(link):
     try:
-        r = requests.get(link)
-        if r.status_code == 200:
-            return True
-        else:
-            return False
+        with requests.Session() as session:
+            login_url = link + "HomeAccess/Account/LogOn"
+            r = session.get(login_url)
+            soup = BeautifulSoup(r.content, 'lxml')
+            login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
     except:
         return False
 
