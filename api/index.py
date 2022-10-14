@@ -1,5 +1,6 @@
-from flask import Flask, request, url_for
+from flask import Flask, request, send_from_directory
 import json
+import os
 import requests
 from bs4 import BeautifulSoup
 
@@ -17,11 +18,14 @@ login_data = {
     'LogOnDetails.Password': ''
 }
 
-app.add_url_rule('/favicon.ico', redirect_to=url_for('static', filename='favicon.ico'))
+link = "https://homeaccess.katyisd.org/"
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-def getAssignments(login_data):
+def getAssignments(login_data,link):
     with requests.Session() as ses:
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link+"HomeAccess/Account/LogOn"
         r = ses.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
@@ -32,7 +36,7 @@ def getAssignments(login_data):
         finaldata = {}
         string = ''
 
-        assignments = ses.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/Assignments.aspx')
+        assignments = ses.get(link+'HomeAccess/Content/Student/Assignments.aspx')
         content = BeautifulSoup(assignments.text, 'lxml')
 
         for x in content.find_all('div', class_='AssignmentClass'):
@@ -89,15 +93,15 @@ def getAssignments(login_data):
 
         return ret
 
-def getInfo(login_data):
+def getInfo(login_data, link):
     with requests.Session() as session:
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link+"HomeAccess/Account/LogOn"
         r = session.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
         post = session.post(login_url, data=login_data)
         ret = {}
-        assignments = session.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/Registration.aspx')
+        assignments = session.get(link+'HomeAccess/Content/Student/Registration.aspx')
         content = BeautifulSoup(assignments.text, 'lxml')
         if content.find('span', id='plnMain_lblRegStudentName') is not None:
             ret['name'] = content.find('span', id='plnMain_lblRegStudentName').text.strip()
@@ -111,9 +115,9 @@ def getInfo(login_data):
         else:
             return None
 
-def getAssignmentClass(login_data,class_name):
+def getAssignmentClass(login_data,link):
     with requests.Session() as ses:
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link+"HomeAccess/Account/LogOn"
         r = ses.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
@@ -124,7 +128,7 @@ def getAssignmentClass(login_data,class_name):
         finaldata = {}
         string = ''
 
-        assignments = ses.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/Assignments.aspx')
+        assignments = ses.get(link+'HomeAccess/Content/Student/Assignments.aspx')
         content = BeautifulSoup(assignments.text, 'lxml')
 
         for x in content.find_all('div', class_='AssignmentClass'):
@@ -182,16 +186,16 @@ def getAssignmentClass(login_data,class_name):
 
         return json.dumps({"error":"class not found"}), 404, {'ContentType':'application/json'}
 
-def getAverages(login_data):
+def getAverages(login_data, link):
     with requests.Session() as session:
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link+"HomeAccess/Account/LogOn"
         r = session.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
         post = session.post(login_url, data=login_data)
         classes = []
         averages = []
-        assignments = session.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/Assignments.aspx')
+        assignments = session.get(link+'HomeAccess/Content/Student/Assignments.aspx')
         content = BeautifulSoup(assignments.text, 'lxml')
 
         for x in content.find_all('div', class_='AssignmentClass'):
@@ -211,16 +215,16 @@ def getAverages(login_data):
 
         return ret
 
-def getClasses(login_data):
+def getClasses(login_data, link):
     with requests.Session() as session:
         print('faslkdfjlakjd')
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link+"HomeAccess/Account/LogOn"
         r = session.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
         post = session.post(login_url, data=login_data)
         classes = []
-        assignments = session.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/Assignments.aspx')
+        assignments = session.get(link+'HomeAccess/Content/Student/Assignments.aspx')
         content = BeautifulSoup(assignments.text, 'lxml')
 
         for x in content.find_all('div', class_='AssignmentClass'):
@@ -233,15 +237,15 @@ def getClasses(login_data):
         ret['classes'] = classes
         return ret
 
-def getReport(login_data):
+def getReport(login_data, link):
     with requests.Session() as session:
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link + "HomeAccess/Account/LogOn"
         r = session.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
         post = session.post(login_url, data=login_data)
         finaldata = {}
-        reportcard = session.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/ReportCards.aspx')
+        reportcard = session.get(link+'HomeAccess/Content/Student/ReportCards.aspx')
         reportcardcontent = BeautifulSoup(reportcard.text, 'lxml')
         headers = ['Course', 'Description', 'Period', 'Teacher', 'Room', '1st', '2nd', '3rd', 'Exam1', 'Sem1', '4th', '5th', '6th', 'Exam2', 'Sem2', 'CND1', 'CND2', 'CND3', 'CND4', 'CND5', 'CND6']
         row = []
@@ -274,16 +278,16 @@ def getReport(login_data):
             return None
         return finaldata
 
-def getProgressReport(login_data):
+def getProgressReport(login_data, link):
     with requests.Session() as session:
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link+"HomeAccess/Account/LogOn"
         r = session.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
         post = session.post(login_url, data=login_data)
         finaldata = {}
         string = ''
-        reportcard = session.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/InterimProgress.aspx')
+        reportcard = session.get(link+'HomeAccess/Content/Student/InterimProgress.aspx')
         reportcardcontent = BeautifulSoup(reportcard.text, 'lxml')
 
         headers = []
@@ -305,15 +309,15 @@ def getProgressReport(login_data):
         finaldata['data'] = data
         return finaldata
 
-def getName(login_data):
+def getName(login_data, link):
     with requests.Session() as ses:
         data = {}
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link + "HomeAccess/Account/LogOn"
         r = ses.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
         post = ses.post(login_url, data=login_data)
-        page = ses.get('https://homeaccess.katyisd.org/HomeAccess/Home/WeekView')
+        page = ses.get(link + 'HomeAccess/Home/WeekView')
         content = BeautifulSoup(page.text, 'lxml')
         if content.find('div', class_='sg-banner-menu-container') is None:
             return None
@@ -321,9 +325,9 @@ def getName(login_data):
         name = container.find('span')
         return name.text.strip()
 
-def getTranscript(login_data):
+def getTranscript(login_data, link):
     with requests.Session() as session:
-        login_url = "https://homeaccess.katyisd.org/HomeAccess/Account/LogOn"
+        login_url = link + "HomeAccess/Account/LogOn"
         r = session.get(login_url)
         soup = BeautifulSoup(r.content, 'lxml')
         login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
@@ -331,7 +335,7 @@ def getTranscript(login_data):
         finaldata = []
         year = []
         semester = []
-        transcript = session.get('https://homeaccess.katyisd.org/HomeAccess/Content/Student/Transcript.aspx')
+        transcript = session.get(link+ "HomeAccess/Content/Student/Transcript.aspx")
         content = BeautifulSoup(transcript.text, 'lxml')
         with open('transcript.html', 'w') as f:
             f.write(str(content))
@@ -384,6 +388,15 @@ def getTranscript(login_data):
                     transcript[text] = num.text.strip()
         return transcript
 
+def checkLink(link):
+    try:
+        r = requests.get(link)
+        if r.status_code == 200:
+            return True
+        else:
+            return False
+    except:
+        return False
 
 @app.route('/', methods=['GET'])
 def home():
@@ -395,11 +408,18 @@ def help():
 
 @app.route('/api/classes', methods=['GET'])
 def classes():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getClasses(data)
+        content = getClasses(data, link)
         if len(content['classes']) == 0:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
 
@@ -408,11 +428,18 @@ def classes():
 
 @app.route("/api/ipr", methods=['GET'])
 def ipr():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getProgressReport(data)
+        content = getProgressReport(data, link)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -420,11 +447,18 @@ def ipr():
 
 @app.route("/api/reportcard", methods=['GET'])
 def reportcard():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getReport(data)
+        content = getReport(data, link)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -432,11 +466,18 @@ def reportcard():
         
 @app.route("/api/averages", methods=['GET'])
 def averages():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getAverages(data)
+        content = getAverages(data, link)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -444,14 +485,21 @@ def averages():
         
 @app.route("/api/assignments", methods=['GET'])
 def assignments():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
         if 'class' in request.args:
-            content = getAssignmentClass(data, request.args['class'])
+            content = getAssignmentClass(data, request.args['class'], link)
             return json.dumps(content), 200, {"Content-Type": "application/json"}
-        content = getAssignments(data) 
+        content = getAssignments(data, link) 
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -459,11 +507,18 @@ def assignments():
         
 @app.route("/api/info", methods=['GET'])
 def info():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getInfo(data)
+        content = getInfo(data, link)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
 
@@ -472,11 +527,18 @@ def info():
 
 @app.route('/api/transcript')
 def transcript():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getTranscript(data)
+        content = getTranscript(data, link)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps(content), 200, {"Content-Type": "application/json"}
@@ -484,11 +546,18 @@ def transcript():
 
 @app.route('/api/name')
 def name():
-    if 'user' in request.args and 'pass' in request.args:
+    if 'user' in request.args and 'pass' in request.args and 'link' in request.args:
+        link = request.args['link']
+        if link[-1] != '/':
+            link += '/'
+        if link[:8] != 'https://':
+            link = 'https://' + link
+        if not checkLink(link):
+            return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
         data = login_data
         data['LogOnDetails.UserName'] = request.args['user']
         data['LogOnDetails.Password'] = request.args['pass']
-        content = getName(data)
+        content = getName(data, link)
         if content is None:
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps({'name':content}), 200, {"Content-Type": "application/json"}
@@ -502,3 +571,6 @@ def page_not_found(e):
 @app.route('/api/')
 def apiHelp():
     return json.dumps({'success': True, 'message': 'This is the home page, visit the documentation at https://homeaccesscenterapi-docs.vercel.app/'}), 200, {"Content-Type": "application/json"}
+
+if __name__ == "__main__":
+    app.run(host='127.0.0.1', port=8080, debug=True)
