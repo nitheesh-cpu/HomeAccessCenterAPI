@@ -337,8 +337,6 @@ def getTranscript(login_data, link):
         semester = []
         transcript = session.get(link+ "HomeAccess/Content/Student/Transcript.aspx")
         content = BeautifulSoup(transcript.text, 'lxml')
-        with open('transcript.html', 'w') as f:
-            f.write(str(content))
         transcript = {}
         
         if content.find_all('td', class_='sg-transcript-group') is None:
