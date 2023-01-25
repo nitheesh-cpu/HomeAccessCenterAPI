@@ -387,6 +387,21 @@ def getTranscript(login_data, link):
                     transcript[text] = num.text.strip()
         return transcript
 
+def getRank(login_data, link):
+    with requests.Session() as session:
+        login_url = link + "HomeAccess/Account/LogOn"
+        r = session.get(login_url)
+        soup = BeautifulSoup(r.content, 'lxml')
+        login_data['__RequestVerificationToken'] = soup.find('input', attrs={'name': '__RequestVerificationToken'})['value']
+        post = session.post(login_url, data=login_data)
+        finaldata = []
+        year = []
+        semester = []
+        transcript = session.get(link+ "HomeAccess/Content/Student/Transcript.aspx")
+        content = BeautifulSoup(transcript.text, 'lxml')
+        rank = (content.find('span', id='plnMain_rpTranscriptGroup_lblGPARank3').text.strip())
+        return rank
+
 def checkLink(link):
     # try:
     with requests.Session() as session:
@@ -584,6 +599,29 @@ def name():
             return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
         return json.dumps({'name':content}), 200, {"Content-Type": "application/json"}
     return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+
+@app.route('/api/rank')
+def rank():
+    if 'user' in request.args and 'pass' in request.args:
+        link = "https://homeaccess.katyisd.org/"
+        if 'link' in request.args:
+            link = request.args['link']
+            if link[-1] != '/':
+                link += '/'
+            if link[:8] != 'https://':
+                link = 'https://' + link
+            if not checkLink(link):
+                return json.dumps({'success': False, 'message': 'Invalid link'}), 200, {"Content-Type": "application/json"}
+        data = login_data
+        data['LogOnDetails.UserName'] = request.args['user']
+        data['LogOnDetails.Password'] = request.args['pass']
+        content = getRank(data, link)
+        if content is None:
+            return json.dumps({'success': False, 'message': 'Invalid username or password'}), 200, {"Content-Type": "application/json"}
+        return json.dumps({'rank':content}), 200, {"Content-Type": "application/json"}
+    return json.dumps({'success': False, 'message': 'Missing required headers: link, user and pass', 'documentation':'https://homeaccesscenterapi-docs.vercel.app/'}), 406, {"Content-Type": "application/json"}
+
+
 
 
 @app.errorhandler(404)
