@@ -385,6 +385,8 @@ def getTranscript(login_data, link):
                     num = z.find_next('span')
                     text = z.text.strip()
                     transcript[text] = num.text.strip()
+                
+        transcript['Rank'] = content.find('span', id='plnMain_rpTranscriptGroup_lblGPARank3').text.strip()
         return transcript
 
 def getRank(login_data, link):
