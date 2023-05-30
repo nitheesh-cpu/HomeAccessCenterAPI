@@ -115,7 +115,7 @@ def getInfo(login_data, link):
         else:
             return None
 
-def getAssignmentClass(login_data,link):
+def getAssignmentClass(login_data, class_name, link):
     with requests.Session() as ses:
         login_url = link+"HomeAccess/Account/LogOn"
         r = ses.get(login_url)
